@@ -35,7 +35,7 @@ function CountCard() {
                             <div className="card-footer">
                                 {/* <button className="btn btn-dark" onClick={handleEvent}>Modify</button> */}
                                 <button className="btn btn-dark" onClick={()=>handleDefault(defaultName)}>Modify</button>
-
+                                        {/* (prev) */}
                             </div>
                         </div>
                     </div>

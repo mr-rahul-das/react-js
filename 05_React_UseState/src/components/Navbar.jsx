@@ -9,7 +9,6 @@ function Navbar() {
 
                 
                 <Button name={"Login"} color={"btn-warning"}/>
-                {/* <button className={`btn ${theme?"btn-light":"btn-dark"}`} onClick={changeTheme}>{theme?"Light Mode":"Dark Mode"}</button> */}
             </div>
 
         </nav>
