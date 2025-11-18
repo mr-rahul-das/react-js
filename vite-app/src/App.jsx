@@ -1,51 +1,46 @@
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
-import Form from './ToDoList/Form';
-import FormList from './ToDoList/FormList';
+import Footer from './components/Footer';
+import Product from './components/Product';
+import Loading from './components/Loading';
 
 function App() {
 
+  let [prodData, setProdData] = useState([]);
+  let [isLoading, setIsLoading] = useState(false);
+  let [error, setError] = useState(null);
+  let [isClicked, setIsClicked] = useState(false);
 
-  let [taskInput, setTaskInput] = useState("");
-  let [taskList, setTaskList] = useState([{ id: 101, task: "Prove them wrong!", isChecked: false }]);
-  let [editId,setEditId]=useState(null);
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (taskInput.trim()) {
-
-      if(editId){
-        setTaskList(prev=>prev.map(ele=>ele.id===editId ? {...ele,task: taskInput } : ele))
-        setEditId(null);
-        setTaskInput("");
-
-      }
-      else{
-
-      let newTask = { id: Date.now(), task: taskInput, isChecked: false };
-      setTaskList(prev => [...prev, newTask]);
-      setTaskInput("");
-
-      }
-
+  useEffect(() => {
+    if (isClicked) {
+      fetchProd()
     }
+  }, [isClicked]);
+
+  async function fetchProd() {
+
+    try {
+      setIsLoading(true);
+      setError(null)
+      let res = await fetch('https://fakestoreapi.com/products');
+      if (!res.ok) {
+        throw new Error("Something went wrong!!!");
+
+      }
+      let data = await res.json();
+      setProdData(data);
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsLoading(false)
+    }
+
   }
 
-  function handleDelete(id) {
-    setTaskList(prev => prev.filter(ele => ele.id !== id));
+  function viewAllProd() {
+    setIsClicked(true);
 
-  }
-
-  function handleToggle(id) {
-    setTaskList(prev => prev.map(ele => ele.id === id ? { ...ele, isChecked: !ele.isChecked } : ele));
-
-  }
-
-  function handleEdit(id) {
-    let editTask = taskList.find(ele => ele.id === id);
-    setTaskInput(editTask.task);
-    setEditId(id);
   }
 
 
@@ -53,18 +48,31 @@ function App() {
     <>
       <Navbar />
 
-
-      <section className="container-fluid mt-5">
-        <div className="row">
-          <Form taskInput={taskInput} setTaskInput={setTaskInput} handleSubmit={handleSubmit} editId={editId} />
+      <section className="container mt-3 ">
+        <div className="row text-center">
+          <div className="col-4">
+            <button className="btn btn-warning" onClick={viewAllProd}>View All Products</button>
+          </div>
+          <div className="col-4">
+            <button className="btn btn-primary">Total Products: {prodData.length}</button>
+          </div>
+          <div className="col-4">
+            <button className="btn btn-success">Something....</button>
+          </div>
         </div>
       </section>
 
-      <section className="container-fluid mt-5">
-        <FormList taskList={taskList} handleDelete={handleDelete} handleToggle={handleToggle} handleEdit={handleEdit} />
 
-      </section>
+      {
+        isLoading && <Loading />
+      }
+      {
+        error && <h2>{error}</h2>
+      }
 
+      <Product data={prodData} />
+
+      <Footer />
 
     </>
   )
